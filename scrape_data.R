@@ -4,9 +4,9 @@ library(tidyverse)
 library(stringi)
 
 #path to executable phantomjs(put your machine path)
-system("C:/.../phantomjs.exe scrape_page.js")
+#system("C:/.../phantomjs.exe scrape_page.js")
 
-paginawebca<-read_html("coes.html")
+paginawebca<-read_html("data/coes.html")
 selectorca<-"#contentHolder > table"
 nodo_tabla<-html_node(paginawebca,selectorca)
 nodo_tabla<-html_table(nodo_tabla)
@@ -22,9 +22,14 @@ data[2:4] <-data %>% select(2:4)%>%
 
 #ploting values 
 library(plotly)
+library(dplyr)
 
-plot_ly(data,x = ~Fecha)%>%
+dates1 <- strptime(as.character(data$Fecha), "%Y-%m-%d %H:%M:%S")
+data <- data[,2:ncol(data)]  #tomamos la parte del dataframe con los valores
+data <- data.frame(date=dates1,data)  #Añadimos las fechas
+
+plot_ly(data,x = ~date)%>%
   add_lines(y=data$Ejecutado, name=colnames(data)[2])%>%
-  add_lines(y=data$`Prog. Diaria`,name=colnames(data)[3])%>%
-  add_lines(y=data$`Prog. Semanal`,name=colnames(data)[4])
+  add_lines(y=data$Prog..Diaria,name=colnames(data)[3])%>%
+  add_lines(y=data$Prog..Semanal,name=colnames(data)[4])
 
